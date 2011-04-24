@@ -72,16 +72,15 @@ var elementTypeSelect = null;
 
 Import(oEditor.FCKConfig.FullBasePath+'dialog/common/fck_dialog_common.js');
 
-window.onload = function()
-{
+window.onload = function() {
 	oEditor.FCKLanguageManager.TranslatePage(document);
 	elementTypeSelect = document.getElementById('cmbElementType');
 	addOptionToSelect(elementTypeSelect, '', '');
 	for (var i = 0; i < elementTypes.length; i++) {
 		addOptionToSelect(elementTypeSelect, elementTypes[i].key, elementTypes[i].name, divType === elementTypes[i].key);
 	}
-	window.parent.SetOkButton( true );
-	window.parent.SetAutoSize( true );
+	window.parent.SetOkButton(true);
+	window.parent.SetAutoSize(true);
 }
 
 function CreateFakeImage(fakeClass, realElement) {
