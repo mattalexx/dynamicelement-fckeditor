@@ -1,12 +1,11 @@
 
-function Import(aSrc) {
-   document.write('<scr'+'ipt type="text/javascript" src="'+aSrc+'"></sc'+'ript>');
-}
+var importScript = function(src) {
+   document.write('<scr'+'ipt type="text/javascript" src="'+src+'"></sc'+'ript>');
+};
 
 var getElementTypes = function() {
 	var elementTypes = [];
 	var xml = new oEditor.FCKXml();
-	console.log(oEditor.FCKConfig.ElementTypesXmlPath);
 	xml.LoadUrl(oEditor.FCKConfig.ElementTypesXmlPath);
 	var elementTypeNodes = xml.SelectSingleNode('elementTypes').childNodes;
 	for (i = 0; i < elementTypeNodes.length; i++) {
@@ -24,7 +23,7 @@ var getElementTypes = function() {
 		}
 	}
 	return elementTypes;
-}
+};
 
 var getSelectedDiv = function() {
 	var CurrentContainers = oEditor.FCKDomTools.GetSelectedDivContainers();
@@ -70,15 +69,18 @@ var div = getSelectedDiv();
 if (div) var divType = divType(div);
 var elementTypeSelect = null;
 
-Import(oEditor.FCKConfig.FullBasePath+'dialog/common/fck_dialog_common.js');
+importScript(oEditor.FCKConfig.FullBasePath+'dialog/common/fck_dialog_common.js');
 
 window.onload = function() {
 	oEditor.FCKLanguageManager.TranslatePage(document);
+
+	// Load select
 	elementTypeSelect = document.getElementById('cmbElementType');
 	addOptionToSelect(elementTypeSelect, '', '');
 	for (var i = 0; i < elementTypes.length; i++) {
 		addOptionToSelect(elementTypeSelect, elementTypes[i].key, elementTypes[i].name, divType === elementTypes[i].key);
 	}
+
 	window.parent.SetOkButton(true);
 	window.parent.SetAutoSize(true);
 }
@@ -95,8 +97,8 @@ function CreateFakeImage(fakeClass, realElement) {
 function insertNewDiv() {
 	var e = oEditor.FCK.EditorDocument.createElement('DIV');
 	e.innerHTML = '<span style="DISPLAY:none">&nbsp;</span>';
-	var oFakeImage = CreateFakeImage( 'FCK__DynamicElement', e);
-	var oRange = new oEditor.FCKDomRange( oEditor.FCK.EditorWindow);
+	var oFakeImage = CreateFakeImage('FCK__DynamicElement', e);
+	var oRange = new oEditor.FCKDomRange(oEditor.FCK.EditorWindow);
 	oRange.MoveToSelection();
 	var oSplitInfo = oRange.SplitBlock();
 	oRange.InsertNode(oFakeImage);
