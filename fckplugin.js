@@ -1,34 +1,34 @@
 ﻿
-FCKCommands.RegisterCommand('InsertDynamicElement', new FCKDialogCommand('InsertDynamicElement', 
-	FCKLang.DlgDynTitleInsertUpdate, FCKPlugins.Items.dynamicelement.Path+'dialog/fck_insert.html', 
-	380, 210));
+var ImportScript = function( sSrc )
+{
+	document.write( '<scr' + 'ipt type="text/javascript" src="' + sSrc + '"></sc' + 'ript>' ) ;
+} ;
+var oApi = window;
+ImportScript( FCKPlugins.Items.dynamicelement.Path + 'common.js' ) ;
 
-var oItem = new FCKToolbarButton('InsertDynamicElement', FCKLang.DlgDynTitleInsertUpdate);
-oItem.IconPath = FCKPlugins.Items.dynamicelement.Path+'dynamicelement.png';
-FCKToolbarItems.RegisterItem('InsertDynamicElement', oItem);
+var sHtmlFile = FCKPlugins.Items.dynamicelement.Path + 'dialog/fck_insert.html' ;
+var oDialogCommand = new FCKDialogCommand( 'InsertDynamicElement',
+	FCKLang.DlgDynTitleInsertUpdate, sHtmlFile, 380, 190 ) ;
+FCKCommands.RegisterCommand( 'InsertDynamicElement', oDialogCommand ) ;
 
-FCK.ContextMenu.RegisterListener({
-	AddItems: function(menu, tag, tagName) {
-		if ( tagName == 'IMG' && tag.className === 'FCK__DynamicElement') {
-			menu.AddSeparator();
-			menu.AddItem('InsertDynamicElement', FCKLang.DlgDynTitleUpdate, 
-				FCKPlugins.Items.dynamicelement.Path+'dynamicelement.png');
-		}
-	}}
-);
+var oItem = new FCKToolbarButton( 'InsertDynamicElement', FCKLang.DlgDynTitleInsertUpdate ) ;
+var sIconUrl = FCKPlugins.Items.dynamicelement.Path + 'dynamicelement.png' ;
+oItem.IconPath = sIconUrl ;
+FCKToolbarItems.RegisterItem( 'InsertDynamicElement', oItem ) ;
 
-var FCKDynamicElementsProcessor = FCKDocumentProcessor.AppendNew();
-FCKDynamicElementsProcessor.ProcessDocument = function(document) {
-	var aDIVs = document.getElementsByTagName('DIV');
-	var eDIV ;
-	var i = aDIVs.length - 1;
-	while (i >= 0 && (eDIV = aDIVs[i--])) {
-		if (eDIV.className.indexOf('dynamicelement') !== -1) {
-			var oFakeImage = FCKDocumentProcessor_CreateFakeImage('FCK__DynamicElement',
-				eDIV.cloneNode(true));
-			oFakeImage.setAttribute('title', eDIV.getAttribute('title'));
-			eDIV.parentNode.insertBefore(oFakeImage, eDIV);
-			eDIV.parentNode.removeChild(eDIV);
-		}
-	}
-}
+var AddItems = function ( oMenu, oTag, sTagName )
+{
+	if ( sTagName !== 'IMG' || oTag.className !== 'FCK__DynamicElement' )
+		return;
+	oMenu.AddSeparator() ;
+	oMenu.AddItem( 'InsertDynamicElement', FCKLang.DlgDynTitleUpdate, sIconUrl ) ;
+} ;
+FCK.ContextMenu.RegisterListener( { AddItems: AddItems } ) ;
+
+FCKDocumentProcessor.AppendNew().ProcessDocument = function( document )
+{
+	var aDivs = document.getElementsByTagName( 'DIV' ) ;
+	var i = aDivs.length - 1 ;
+	while ( i >= 0 && ( oDiv = aDivs[i--] ) )
+		ProcessDiv(oDiv, FCKDocumentProcessor_CreateFakeImage);
+} ;
