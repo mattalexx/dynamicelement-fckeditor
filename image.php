@@ -48,7 +48,7 @@ class Process {
 
 }
 
-$command = 'convert -fill \'#2276c0\' -font Arial -pointsize 14 label:"'.strtoupper($_GET['text']).'" png:-';
+$command = 'convert -fill \'#2276c0\' -font '.dirname(__FILE__).'/HelveticaLTStdCond.otf -pointsize 14 label:"'.strtoupper($_GET['text']).'" png:-';
 $process = new Process($command);
 header('Content-type: image/png');
 print $process->stdout;
