@@ -144,12 +144,14 @@ var GetSelectedDiv = function()
 var InitializeSelect = function( )
 {
 	oSelect = document.getElementById( 'cmbElementType' ) ;
-	AddOptionToSelect( oSelect, '', '' ) ;
 	var aElementTypes = GetElementTypes() ;
 	var oSelectedDiv = GetSelectedDiv() ;
+
 	var sSelectedDivType = false;
 	if (oSelectedDiv)
 		sSelectedDivType = oSelectedDiv.getAttribute( 'data-type' );
+
+	AddOptionToSelect( oSelect, '', '' ) ;
 	for ( var i = 0 ; i < aElementTypes.length ; i++ )
 		AddOptionToSelect( oSelect, aElementTypes[i].key,
 			aElementTypes[i].name, sSelectedDivType === aElementTypes[i].key ) ;
