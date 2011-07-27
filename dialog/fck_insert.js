@@ -160,6 +160,7 @@ var CreateNewDiv = function ()
 	var oDiv = oEditor.FCK.EditorDocument.createElement( 'DIV' ) ;
 	var oRange = new oEditor.FCKDomRange( oEditor.FCK.EditorWindow ) ;
 	oRange.MoveToSelection() ;
+	oRange.SplitBlock() ;
 	oRange.InsertNode( oDiv ) ;
 	oEditor.FCK.Events.FireEvent( 'OnSelectionChange' ) ;
 	return oDiv ;
