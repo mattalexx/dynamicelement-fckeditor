@@ -186,10 +186,6 @@ var Ok = function ()
 
 	ProcessDiv(oDiv);
 
-	var oSelectedImage = GetSelectedImage() ;
-	if ( oSelectedImage )
-		oSelectedImage.parentNode.removeChild( oSelectedImage ) ;
-
 	return true ;
 } ;
 
