@@ -27,7 +27,7 @@ FCK.ContextMenu.RegisterListener( { AddItems: AddItems } ) ;
 
 FCKDocumentProcessor.AppendNew().ProcessDocument = function( document )
 {
-	var aDivs = document.getElementsByTagName( 'DIV' ) ;
+	var aDivs = document.getElementsByClassName( 'dynamicelement' ) ;
 	var i = aDivs.length - 1 ;
 	while ( i >= 0 && ( oDiv = aDivs[i--] ) )
 		ProcessDiv(oDiv);
