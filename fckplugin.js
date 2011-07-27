@@ -30,5 +30,5 @@ FCKDocumentProcessor.AppendNew().ProcessDocument = function( document )
 	var aDivs = document.getElementsByTagName( 'DIV' ) ;
 	var i = aDivs.length - 1 ;
 	while ( i >= 0 && ( oDiv = aDivs[i--] ) )
-		ProcessDiv(oDiv, FCKDocumentProcessor_CreateFakeImage);
+		ProcessDiv(oDiv);
 } ;
