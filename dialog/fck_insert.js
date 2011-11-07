@@ -26,6 +26,17 @@ var ImportScript = function( sSrc )
 	document.write( '<scr' + 'ipt type="text/javascript" src="' + sSrc + '"></sc' + 'ript>' ) ;
 } ;
 
+var LoadJson = function( sSrc )
+{
+	var request = new XMLHttpRequest();
+	request.open( 'GET', sSrc, false );
+	request.send( null );
+	if ( request.status == 200 )
+	{
+		return eval( '(' + request.responseText + ')' );
+	}
+} ;
+
 var AddOptionToSelect = function(oSelect, sValue, sLabel, isSelected)
 {
 	var oOption = document.createElement('option');
@@ -49,7 +60,7 @@ var GetElementTypes = function()
 	aElementTypes = [] ;
 	var oXml = new oEditor.FCKXml() ;
 	oXml.LoadUrl( oEditor.FCKConfig.ElementTypesXmlPath ) ;
-	var aNodes = oXml.SelectSingleNode( 'elementTypes' ).childNodes ;
+	var aNodes = oXml.SelectNodes('/xml/elementTypes/elementType');
 	for ( i = 0 ; i < aNodes.length ; i++ )
 	{
 		var oNode = aNodes[i] ;
@@ -60,6 +71,56 @@ var GetElementTypes = function()
 				key: oNode.getAttribute( 'key' ),
 				name: oNode.getAttribute( 'name' )
 			} ;
+
+			var aFields = oNode.querySelector( 'fields' );
+			if ( aFields.childNodes )
+			{
+				obj.fields = [] ;
+
+				for ( i = 0 ; i < aFields.childNodes.length ; i++ )
+				{
+					var oField = aFields.childNodes[i] ;
+					
+					var field =
+					{
+						key: oField.getAttribute( 'key' ),
+						name: oField.getAttribute( 'name' ),
+						type: oField.getAttribute( 'type' )
+					} ;
+
+					switch (oField.getAttribute('type')) {
+						case 'select':
+							var items = oField.querySelector( 'items' ) ;
+									debugger;
+							if (items)
+							{
+								var items_ = {};
+								for ( i = 0 ; i < items.childNodes.length ; i++ )
+								{
+									var value = items.childNodes[i].getAttribute('value') ;
+									var label = items.childNodes[i].getAttribute('label') ;
+									items_[value] = label;
+								}
+
+								field.items = items_;
+								break;
+							}
+
+							var jsonSource = oField.getAttribute( 'jsonSource' ) ;
+							if (jsonSource)
+							{
+								var data = LoadJson( jsonSource ) ;
+								field.items = data.items ;
+								break;
+							}
+								
+							break;
+					}
+
+					obj.fields.push( field );
+				}
+			}
+
 			if ( oNode.getAttribute( 'depends' ) )
 			{
 				obj.depends = oNode.getAttribute( 'depends' ) ;
@@ -76,8 +137,10 @@ var GetElementType = function( key )
 {
 	var aElementTypes = GetElementTypes() ;
 	for ( var i = 0 ; i < aElementTypes.length ; i++ )
+	{
 		if ( aElementTypes[i].key === key )
 			return aElementTypes[i];
+	}
 
 	return false ;
 } ;
@@ -153,8 +216,73 @@ var InitializeSelect = function( )
 
 	AddOptionToSelect( oSelect, '', '' ) ;
 	for ( var i = 0 ; i < aElementTypes.length ; i++ )
-		AddOptionToSelect( oSelect, aElementTypes[i].key,
-			aElementTypes[i].name, sSelectedDivType === aElementTypes[i].key ) ;
+	{
+		var isSelected = ( sSelectedDivType === aElementTypes[i].key ) ;
+		AddOptionToSelect( oSelect, aElementTypes[i].key, aElementTypes[i].name,
+			isSelected ) ;
+	}
+
+	var refresh = function() {
+		var oFieldsDiv = GetFieldsDiv();
+
+		while (oFieldsDiv.childNodes[0])
+		{
+			var child = oFieldsDiv.childNodes[0];
+			oFieldsDiv.removeChild(child);
+		}
+
+		if ( oSelect.selectedIndex === 0 )
+			return false ;
+
+		var oElementType = GetElementType( oSelect.options[oSelect.selectedIndex].value ) ;
+
+		if ( ! oElementType.fields )
+			return false ;
+
+		for ( var i = 0 ; i < oElementType.fields.length ; i++ )
+		{
+			var field = oElementType.fields[i] ;
+
+			var oFieldDiv = document.createElement('div') ;
+			oFieldDiv.className = 'field' ;
+			oFieldDiv.id = 'field-' + field.key ;
+
+			var oFieldLabel = document.createElement('div') ;
+			oFieldLabel.textContent = field.name;
+			oFieldDiv.appendChild( oFieldLabel );
+
+			switch (field.type) {
+				case 'select':
+
+					var sValue;
+					if (oSelectedDiv)
+						sValue = oSelectedDiv.getAttribute( 'data-param-' + field.key );
+
+					var oFieldSelect = document.createElement('select');
+					AddOptionToSelect( oFieldSelect, '', '' ) ;
+					for (var value in field.items)
+					{
+						var isSelected = ( sValue === value ) ;
+						AddOptionToSelect( oFieldSelect, value,
+							field.items[value], isSelected);
+					}
+					oFieldDiv.appendChild( oFieldSelect );
+					break;
+			}
+
+			oFieldsDiv.appendChild( oFieldDiv );
+		}
+	} ;
+
+	oSelect.onchange = refresh ;
+	refresh();
+} ;
+
+var GetFieldsDiv = function ()
+{
+	var oSelect = document.getElementById( 'cmbElementType' ) ;
+	var oFieldsDiv = oSelect.nextSibling.nextSibling;
+	return oFieldsDiv;
 } ;
 
 var CreateNewDiv = function ()
@@ -183,6 +311,23 @@ var Ok = function ()
 	oDiv.setAttribute( 'data-type', oElementType.key ) ;
 	oDiv.setAttribute( 'title', oElementType.name ) ;
 	oDiv.innerHTML = '' ;
+
+	if ( oElementType.fields )
+	{
+		for ( var i = 0 ; i < oElementType.fields.length ; i++ )
+		{
+			var field = oElementType.fields[i] ;
+			var oFieldDiv = document.getElementById('field-' + field.key ) ;
+
+			switch (field.type) {
+				case 'select':
+					var select = oFieldDiv.getElementsByTagName('select')[0];
+					var value = select.options[select.selectedIndex].value ;
+					oDiv.setAttribute( 'data-param-' + field.key, value ) ;
+					break;
+			}
+		}
+	}
 
 	ProcessDiv(oDiv);
 
