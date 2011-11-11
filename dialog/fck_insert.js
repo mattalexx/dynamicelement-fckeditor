@@ -61,73 +61,76 @@ var GetElementTypes = function()
 	var oXml = new oEditor.FCKXml() ;
 	oXml.LoadUrl( oEditor.FCKConfig.ElementTypesXmlPath ) ;
 	var aNodes = oXml.SelectNodes('/xml/elementTypes/elementType');
+
 	for ( i = 0 ; i < aNodes.length ; i++ )
 	{
 		var oNode = aNodes[i] ;
-		if ( oNode.nodeType == 1 )
+		if ( oNode.nodeType !== 1 )
 		{
-			var obj =
-			{
-				key: oNode.getAttribute( 'key' ),
-				name: oNode.getAttribute( 'name' )
-			} ;
-
-			var aFields = oNode.querySelector( 'fields' );
-			if ( aFields.childNodes )
-			{
-				obj.fields = [] ;
-
-				for ( i = 0 ; i < aFields.childNodes.length ; i++ )
-				{
-					var oField = aFields.childNodes[i] ;
-					
-					var field =
-					{
-						key: oField.getAttribute( 'key' ),
-						name: oField.getAttribute( 'name' ),
-						type: oField.getAttribute( 'type' )
-					} ;
-
-					switch (oField.getAttribute('type')) {
-						case 'select':
-							var items = oField.querySelector( 'items' ) ;
-									debugger;
-							if (items)
-							{
-								var items_ = {};
-								for ( i = 0 ; i < items.childNodes.length ; i++ )
-								{
-									var value = items.childNodes[i].getAttribute('value') ;
-									var label = items.childNodes[i].getAttribute('label') ;
-									items_[value] = label;
-								}
-
-								field.items = items_;
-								break;
-							}
-
-							var jsonSource = oField.getAttribute( 'jsonSource' ) ;
-							if (jsonSource)
-							{
-								var data = LoadJson( jsonSource ) ;
-								field.items = data.items ;
-								break;
-							}
-								
-							break;
-					}
-
-					obj.fields.push( field );
-				}
-			}
-
-			if ( oNode.getAttribute( 'depends' ) )
-			{
-				obj.depends = oNode.getAttribute( 'depends' ) ;
-				obj.dependsTitle = oNode.getAttribute( 'dependsTitle' ) ;
-			}
-			aElementTypes.push( obj ) ;
+			continue;
 		}
+
+		var obj =
+		{
+			key: oNode.getAttribute( 'key' ),
+			name: oNode.getAttribute( 'name' )
+		} ;
+
+		var aFields = oNode.querySelector( 'fields' );
+		if ( aFields.childNodes )
+		{
+			obj.fields = [] ;
+
+			for ( ii = 0 ; ii < aFields.childNodes.length ; ii++ )
+			{
+				var oField = aFields.childNodes[ii] ;
+				
+				var field =
+				{
+					key: oField.getAttribute( 'key' ),
+					name: oField.getAttribute( 'name' ),
+					type: oField.getAttribute( 'type' )
+				} ;
+
+				switch (oField.getAttribute('type')) {
+					case 'select':
+						var items = oField.querySelector( 'items' ) ;
+						if (items)
+						{
+							var items_ = {};
+							for ( iii = 0 ; iii < items.childNodes.length ; iii++ )
+							{
+								var value = items.childNodes[iii].getAttribute('value') ;
+								var label = items.childNodes[iii].getAttribute('label') ;
+								items_[value] = label;
+							}
+
+							field.items = items_;
+							break;
+						}
+
+						var jsonSource = oField.getAttribute( 'jsonSource' ) ;
+						if (jsonSource)
+						{
+							var data = LoadJson( jsonSource ) ;
+							field.items = data.items ;
+							break;
+						}
+							
+						break;
+				}
+
+				obj.fields.push( field );
+			}
+		}
+
+		if ( oNode.getAttribute( 'depends' ) )
+		{
+			obj.depends = oNode.getAttribute( 'depends' ) ;
+			obj.dependsTitle = oNode.getAttribute( 'dependsTitle' ) ;
+		}
+
+		aElementTypes.push( obj ) ;
 	}
 
 	return aElementTypes ;
