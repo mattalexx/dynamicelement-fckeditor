@@ -275,6 +275,8 @@ var InitializeSelect = function( )
 
 			oFieldsDiv.appendChild( oFieldDiv );
 		}
+
+		window.parent.SetAutoSize( true ) ;
 	} ;
 
 	oSelect.onchange = refresh ;
