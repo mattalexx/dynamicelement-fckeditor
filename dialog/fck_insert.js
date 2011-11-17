@@ -77,7 +77,7 @@ var GetElementTypes = function()
 		} ;
 
 		var aFields = oNode.querySelector( 'fields' );
-		if ( aFields.childNodes )
+		if ( aFields && aFields.childNodes )
 		{
 			obj.fields = [] ;
 
