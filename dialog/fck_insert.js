@@ -256,7 +256,6 @@ var InitializeSelect = function( )
 
 			switch (field.type) {
 				case 'select':
-
 					var sValue;
 					if (oSelectedDiv)
 						sValue = oSelectedDiv.getAttribute( 'data-param-' + field.key );
@@ -269,7 +268,20 @@ var InitializeSelect = function( )
 						AddOptionToSelect( oFieldSelect, value,
 							field.items[value], isSelected);
 					}
+
 					oFieldDiv.appendChild( oFieldSelect );
+					break;
+				case 'string':
+
+					var sValue = '';
+					if (oSelectedDiv)
+						sValue = oSelectedDiv.getAttribute( 'data-param-' + field.key );
+
+					var oFieldInput = document.createElement('input');
+					oFieldInput.setAttribute('type', 'text');
+					oFieldInput.setAttribute('value', sValue);
+
+					oFieldDiv.appendChild( oFieldInput );
 					break;
 			}
 
@@ -328,6 +340,11 @@ var Ok = function ()
 				case 'select':
 					var select = oFieldDiv.getElementsByTagName('select')[0];
 					var value = select.options[select.selectedIndex].value ;
+					oDiv.setAttribute( 'data-param-' + field.key, value ) ;
+					break;
+				case 'string':
+					var input = oFieldDiv.getElementsByTagName('input')[0];
+					var value = input.value ;
 					oDiv.setAttribute( 'data-param-' + field.key, value ) ;
 					break;
 			}
